@@ -1,22 +1,23 @@
 #ifndef SERVER_H
 #define SERVER_H
 #include "IUnknown.h"
+#include <windows.h>
 #include "OBJBASE.h"
 class Server : public IX
 {
 private:
     int a, b, result;
-    long m_cRef_;
+    long m_cRef;
 public:
     Server();
     Server(int, int);
-    ~Server();
-    HRESULT_ QueryInterface_(IID_, void**);
-    ULONG_ AddRef_();
-    ULONG_ Release_();
+    virtual ~Server();
+    virtual HRESULT __stdcall QueryInterface(const IID&, void**);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
-    virtual int Nok();
-    virtual int Nod();
+    virtual int __stdcall LCM();
+    virtual int __stdcall GCD();
 };
 
 class ServerMod : public IX, public IY
@@ -24,45 +25,46 @@ class ServerMod : public IX, public IY
 private:
     Server* ServerDefautlt;
     int a, b, result;
-    long m_cRef_;
+    long m_cRef;
 public:
     ServerMod();
-    ~ServerMod();
-    HRESULT_ QueryInterface_(IID_, void**);
-    ULONG_ AddRef_();
-    ULONG_ Release_();
+    virtual ~ServerMod();
+    virtual HRESULT __stdcall QueryInterface(const IID&, void**);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
 
-    virtual int Nok();
-    virtual int Nod();
-    virtual int Sum();
+    virtual int __stdcall LCM();
+    virtual int __stdcall GCD();
+    virtual int __stdcall Sum();
 
 };
 
-class ServerFactory : public IClassFactory2_
+class ServerFactory : public IClassFactory2
 {
 private:
-    long m_cRef_;
+    long m_cRef;
 public:
     ServerFactory();
-    ~ServerFactory();
-    HRESULT_ CreateInstance_(IID_, void**);
-    HRESULT_ CreateInstance2_(IID_, void**, int, int);
-    HRESULT_ QueryInterface_(IID_, void**);
-    ULONG_ AddRef_();
-    ULONG_ Release_();
+    virtual ~ServerFactory();
+    virtual HRESULT __stdcall CreateInstance(IUnknown*, const IID&, void**);
+    virtual HRESULT __stdcall CreateInstance2(IUnknown*, const IID&, void**, int, int);
+    virtual HRESULT __stdcall QueryInterface(const IID&, void**);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
+    virtual HRESULT __stdcall LockServer(BOOL bLock);
 };
 
-class ServerModFactory : public IClassFactory_
+class ServerModFactory : public IClassFactory
 {
 private:
-    long m_cRef_;
+    long m_cRef;
 public:
     ServerModFactory();
-    ~ServerModFactory();
-    HRESULT_ CreateInstance_(IID_, void**);
-    HRESULT_ CreateInstance2_(IID_, void**, int, int);
-    HRESULT_ QueryInterface_(IID_, void**);
-    ULONG_ AddRef_();
-    ULONG_ Release_();
+    virtual ~ServerModFactory();
+    virtual HRESULT __stdcall CreateInstance(IUnknown*, const IID&, void**);
+    virtual HRESULT __stdcall QueryInterface(const IID&, void**);
+    virtual ULONG __stdcall AddRef();
+    virtual ULONG __stdcall Release();
+    virtual HRESULT __stdcall LockServer(BOOL bLock);
 };
 #endif
