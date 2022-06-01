@@ -12,6 +12,7 @@ IClassFactory2* pFGlobal = NULL;
 
 extern "C" HRESULT __declspec(dllexport) __stdcall DllGetClassObject(const CLSID& CLSID, const IID& IID, void** ppv)
 {
+    cout << "BeforeDLLGET" << endl;
     IUnknown* pIUnknown = NULL;
     if (CLSID == CLSID_Server)
     {
@@ -28,21 +29,9 @@ extern "C" HRESULT __declspec(dllexport) __stdcall DllGetClassObject(const CLSID
         cout << "DllGetClassObject: connection error." << endl;
         return S_FALSE; 
     }
-    return pIUnknown->QueryInterface(IID, ppv);
-}
-
-HRESULT GlobalCreateInstance(CLSID CLSID, IID IID, void** ppv, int num1, int num2)
-{
-    if (CLSID == CLSID_Server)
-    {
-        DllGetClassObject(CLSID, IID_IClassFactory2, (void**)&pFGlobal);
-    }
-    else
-    {
-        cout << "GlobalCreateInstance: connection error." << endl;
-        return S_FALSE;
-    }
-    return pFGlobal->CreateInstance2(NULL, IID, ppv, num1, num2);
+    HRESULT resTmp = pIUnknown->QueryInterface(IID, ppv);
+    cout << "AfterDLLGET" << endl;
+    return resTmp;
 }
 
 extern "C"  HRESULT __declspec(dllexport) __stdcall DllRegisterServer(void) {};
@@ -150,7 +139,11 @@ ServerMod::ServerMod()
 {
     m_cRef = 0;
     cout << "ServerMod.Constructor: Created." << endl;
-    GlobalCreateInstance(CLSID_Server, IID_IX, (void**)&this->ServerDefautlt, 6, 3);
+    IClassFactory2* pF = NULL;
+    CoGetClassObject(CLSID_Server, CLSCTX_INPROC_SERVER, NULL, IID_IClassFactory2, (void**)&pF);
+    IX* pX = NULL;
+    pF->CreateInstance2(NULL, IID_IX, (void**)&ServerDefautlt, 3, 6);
+    pF->Release();
 };
 
 
@@ -197,7 +190,7 @@ ULONG __stdcall ServerMod::AddRef()
 ULONG __stdcall ServerMod::Release()
 { 
     cout << "ServerMod.Release = " << m_cRef - 1 << endl;
-    //ServerDefautlt->Release();
+    ServerDefautlt->Release();
     if(global_m_cRef != 0)
     {
         cout << "ServerMod.GloblaRelease = " << global_m_cRef - 1 << endl;
@@ -333,6 +326,7 @@ HRESULT __stdcall ServerModFactory::CreateInstance(IUnknown* pUnknownOuter, cons
 
 HRESULT __stdcall ServerModFactory::QueryInterface(const IID& IID, void** ppv)
 {
+    cout << "Before ServerModFactory::QueryInterface" << endl;
     if (IID == IID_IClassFactory)
     {
         cout << "ServerModFactory.QueryInterface: IClassFactory connected." << endl;
@@ -345,6 +339,7 @@ HRESULT __stdcall ServerModFactory::QueryInterface(const IID& IID, void** ppv)
         return S_FALSE;
     }
     reinterpret_cast<IUnknown*>(*ppv)->AddRef();
+    cout << "After ServerModFactory::QueryInterface" << endl;
     return S_OK;
 };
 
@@ -359,7 +354,6 @@ ULONG __stdcall ServerModFactory::AddRef()
 ULONG __stdcall ServerModFactory::Release() 
 { 
     cout << "ServerModFactory.Release = " << m_cRef - 1 << endl;
-    //pFGlobal->Release();
     if(global_m_cRef != 0)
     {
         cout << "ServerModFactory.GlobalRelease = " << global_m_cRef - 1 << endl;

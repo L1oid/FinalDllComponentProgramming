@@ -8,7 +8,9 @@ int main()
 {
     CoInitialize(NULL);
     IClassFactory* pF = NULL;
+    cout << "BeforeCOGET" << endl;
     HRESULT result = CoGetClassObject(CLSID_ServerMod, CLSCTX_INPROC_SERVER, NULL, IID_IClassFactory, (void**)&pF);
+    cout << "AfterCOGET" << endl;
     if (result == S_OK)
     {
         IY* pY = NULL;
@@ -20,13 +22,13 @@ int main()
         else
         {
             cout << "Warning1" << endl;
-            //pF->Release();
+            pF->Release();
             CoUninitialize();
             system("pause");
             return 0;
         }
-        //pY->Release();
-        //pF->Release();
+        pY->Release();
+        pF->Release();
         CoUninitialize();
         system("pause");
         return 0;
